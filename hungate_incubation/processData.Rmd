@@ -1,0 +1,27 @@
+---
+title: "Process data to long format"
+author: "K Todd-Brown (ktoddbrown@gmail.com)"
+date: "May 7, 2015"
+output: html_document
+---
+
+```{r}
+library(xlsx)
+```
+
+```{r}
+bulkDensity_meta <- read.xlsx(file='SICO2_FL_Soil_Bulk_Density.xlsx', sheetIndex=1)
+bulkDensity_2001 <- read.xlsx(file='SICO2_FL_Soil_Bulk_Density.xlsx', sheetIndex=2)
+bulkDensity_2002 <- read.xlsx(file='SICO2_FL_Soil_Bulk_Density.xlsx', sheetIndex=3)
+
+bulkDensity_2001$year <- 2001
+names(bulkDensity_2001) <- c('depth', 'bulk_density', 'std_error', 'year')
+bulkDensity_2002$year <- 2002
+```
+
+"Soil incubations from Carney et al. 2007 (PNAS). Soils from the CO2 experiment were collected in July 2004. Soils were incubated for 60 days at constant moisture (11%) and temperature (25 C) in the lab. Some soils received additions of N (50) and litter (133 mg). The litter was either from the elevated CO2 plots (d13C = -39.08 per mil) or from the ambient CO2 plots (labeled A133 in the table, d13C = ????). CO2 production was measured using the LiCOR configured in closed-injection loop mode. d13C of CO2 produced was measured by IRMS at the CPSIL. The incubation vessels were 120 mL. Mass of soil incubated was 20 g ODE." - header information
+```{r}
+priming_incubation <- read.xlsx(file='SICO2_FL_priming incubation.xlsx', sheetIndex=1, startRow=9)
+priming_incubation <- priming_incubation[,1:16]
+names(priming_incubation) <- c('meanDay', 'period', 'CO2', 'plot', 'N' , 'litter', 'd13C', 'd18O', 'CO2_LiCor', 'CO2_massSpec', 'CO2_cor', 'CO2', 'numDays', 'soilMass', 'dCO2', 'blank_corrected_d13C')
+```
