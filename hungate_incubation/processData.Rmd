@@ -11,45 +11,6 @@ library(ggplot2)
 library(reshape2)
 ```
 
-```{r bulkDensity}
-bulkDensity_meta <- read.xlsx(file='SICO2_FL_Soil_Bulk_Density.xlsx', sheetIndex=1)
-
-cat(sprintf('Title: %s\nInvestigators: %s (contact), %s, %s,  %s,  %s\nStudy period:%s -- %s\nSite: %s [%s x %s at %s meters]\nAbstract: %s\nMethod: %s\nAssociated publication: %s\n', bulkDensity_meta[6,3], 
-            bulkDensity_meta[7,3], bulkDensity_meta[7,4], bulkDensity_meta[7,5], bulkDensity_meta[8,3], bulkDensity_meta[8,4],
-            bulkDensity_meta[10,3],bulkDensity_meta[11,3],
-            bulkDensity_meta[12,3], bulkDensity_meta[13,3], bulkDensity_meta[14,3], bulkDensity_meta[15,3],
-            bulkDensity_meta[18,3],
-            bulkDensity_meta[19,3],
-            bulkDensity_meta[25,3]))
-
-bulkDensity_2001 <- read.xlsx(file='SICO2_FL_Soil_Bulk_Density.xlsx', sheetIndex=2)
-bulkDensity_2002 <- read.xlsx(file='SICO2_FL_Soil_Bulk_Density.xlsx', sheetIndex=3)
-bulkDensity_2002 <- bulkDensity_2002[, 1:4]
-
-#datasetID <- bulkDensity_meta[5,3]
-datasetID <- 'Hungate_incubation'
-
-names(bulkDensity_2001) <- c('depth_cm', 'bulk_density', 'std_error')
-bulkDensity_2001$unit <- 'g cm^-3'
-bulkDensity_2001$year <- 2001
-bulkDensity_2001$CO2_treatment <- 'A'
-
-names(bulkDensity_2002) <- c('plot', 'CO2_treatment', 'depth_cm', 'bulk_density')
-bulkDensity_2002$unit <- 'g cm^-3'
-bulkDensity_2002$year <- 2002
-bulkDensity_2002$depth_cm <- gsub(' cm', '', as.character(bulkDensity_2002$depth_cm))
-
-bulkDensity <- merge(bulkDensity_2002, bulkDensity_2001, all=TRUE)
-
-depth.df <- as.data.frame(t(as.data.frame(strsplit(bulkDensity$depth, '-'))))
-names(depth.df) <- c('min', 'max')
-row.names(depth.df) <- NULL
-#bulkDensity$newdepth <- sprintf('%03d-%03d', as.numeric(as.character(depth.df$min)), as.numeric(as.character(depth.df$max)))
-bulkDensity$meanDepth_cm <- (as.numeric(as.character(depth.df$min)) + as.numeric(as.character(depth.df$max)))/2
-ggplot(data=bulkDensity) + geom_point(aes(x=meanDepth_cm, y=bulk_density, shape=factor(year), color=CO2_treatment)) + geom_errorbar(aes(x=meanDepth_cm, ymax=bulk_density+std_error, ymin=bulk_density-std_error)) + ylab('Bulk density [g cm^-3]')
-```
-
-
 ```{r soilProperties}
 soilProperty_meta <- read.xlsx(file='SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions.xlsx', sheetIndex=1)
 
@@ -61,7 +22,8 @@ cat(sprintf('Title: %s\nInvestigators: %s (contact), %s, %s,  %s, %s, %s, %s, %s
             soilProperty_meta[19,3],
             soilProperty_meta[25,3]))
 
-soilProperty <- read.xlsx(file='SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions.xlsx', sheetIndex=5)
+#soilProperty <- read.xlsx(file='SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions.xlsx', sheetIndex=5)
+soilProperty <- read.csv(file='SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions_sheet5.csv', check.names=FALSE)
 soilProperty <- soilProperty[,c(1:4,6,10)]
 names(soilProperty) <- c('date', 'plot', 'CO2_treatment', 'depth_cm', 'bulkDensity_g_cm3', 'perc_C')
 
@@ -73,7 +35,8 @@ soilProperty <- soilProperty[grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm)
 cat(sprintf('Dropping [%d] entries due to missing C percentage.\n', sum(!grepl('^\\d+?\\.\\d*$', soilProperty$perc_C))))
 soilProperty <- soilProperty[grepl('^\\d+?\\.\\d*$', soilProperty$perc_C),]
 soilProperty$perc_C <- as.numeric(as.character(soilProperty$perc_C))
-soilProperty$year <- as.numeric(substr(as.character(soilProperty$date), 1,4))
+soilProperty$year <- as.numeric(substr(as.character(soilProperty$date), 5, 6))
+soilProperty$year <- ifelse(soilProperty$year > 90, soilProperty$year + 1900, soilProperty$year + 2000)
 
 depth.df <- as.data.frame(t(as.data.frame(strsplit(as.character(soilProperty$depth_cm), '-'))))
 names(depth.df) <- c('min', 'max')
