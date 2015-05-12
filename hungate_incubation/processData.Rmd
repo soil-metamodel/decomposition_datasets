@@ -23,6 +23,7 @@ cat(sprintf('Title: %s\nInvestigators: %s (contact), %s, %s,  %s, %s, %s, %s, %s
             soilProperty_meta[25,3]))
 
 #soilProperty <- read.xlsx(file='SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions.xlsx', sheetIndex=5)
+##Running into issues with the 'date' cell class so exported to csv as a quick fix
 soilProperty <- read.csv(file='SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions_sheet5.csv', check.names=FALSE)
 soilProperty <- soilProperty[,c(1:4,6,10)]
 names(soilProperty) <- c('date', 'plot', 'CO2_treatment', 'depth_cm', 'bulkDensity_g_cm3', 'perc_C')
@@ -77,7 +78,7 @@ row.names(depth.df) <- NULL
 #incubation$newdepth <- sprintf('%03d-%03d', as.numeric(as.character(depth.df$min)), as.numeric(as.character(depth.df$max)))
 incubation_2002$meanDepth_cm <- (as.numeric(as.character(depth.df$min)) + as.numeric(as.character(depth.df$max)))/2
 
-ggplot(incubation_2002) + geom_point(aes(x=incubation_day, y=dCO2, color=CO2_treatment), alpha=0.5)
+ggplot(incubation_2002) + geom_point(aes(x=incubation_day, y=dCO2, color=CO2_treatment), alpha=0.5)+scale_x_log10()
 
 incubation_2007 <- read.xlsx(file='SICO2_FL_soil_lab_incubations.xlsx', sheetIndex=3, startRow=10)
 incubation_2007 <- incubation_2007[,1:16]
@@ -98,7 +99,7 @@ row.names(depth.df) <- NULL
 #incubation$newdepth <- sprintf('%03d-%03d', as.numeric(as.character(depth.df$min)), as.numeric(as.character(depth.df$max)))
 incubation_2007$meanDepth_cm <- (as.numeric(as.character(depth.df$min)) + as.numeric(as.character(depth.df$max)))/2
 
-ggplot(incubation_2007) + geom_point(aes(x=incubation_day, y=dCO2, color=CO2_treatment), alpha=0.5)
+ggplot(incubation_2007) + geom_point(aes(x=incubation_day, y=dCO2, color=CO2_treatment), alpha=0.5)+scale_x_log10()
 
 incubation <- merge(incubation_2007, incubation_2002, all=TRUE)
 names(incubation)[1] <- 'year'
