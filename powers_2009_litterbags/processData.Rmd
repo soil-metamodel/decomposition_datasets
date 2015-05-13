@@ -1,0 +1,45 @@
+---
+title: "Data processing from Powers et al 2009"
+author: "K Todd-Brown (ktoddbrown@gmail.com)"
+date: "May 13, 2015"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+```
+
+```{r loadData}
+orgData <- read.csv('data.csv')
+orgData <- orgData[!is.na(orgData$IDENTIFICATION.NUMBER),] #more missing data
+orgData$LN_PERCENTMASSLEFT <- as.numeric(as.character(orgData$ln.percentmassleft.))
+names(orgData) <- gsub('\\.', '_', names(orgData))
+orgData$INITIAL_OVEN_DRIED_WEIGHT <- as.numeric(as.character(orgData$INITIAL_OVEN_DRIED_WEIGHT))
+orgData$FINAL_WEIGHT <- as.numeric(as.character(orgData$FINAL_WEIGHT))
+orgData$PERCENT_MASS_LEFT <- as.numeric(as.character(orgData$PERCENT_MASS_LEFT))
+
+sites <- read.csv('sites.csv')
+names(sites) <- gsub('\\.', '_', names(sites))
+sites$START_DATE <- NULL #bad startdate here
+```
+
+```{r extractData}
+data <- merge(sites, orgData[, c('SITE_NUMBER', 'IDENTIFICATION_NUMBER', 'BLOCK', 'ENVIRONMENT', 'LITTER_QUALITY', 'FAUNA_TREATMENT', 'REPLICATE_NUMBER', 'COLLECTION_DATE', 'PERCENT_MASS_LEFT', 'DAYSINFIELD')], all=TRUE)
+
+data$caseID <- sprintf('%s_%s', data$LITTER_QUALITY, data$FAUNA_TREATMENT)
+
+data$MAPCLASS <- ifelse(data$MAP < 1000, '<1000', 
+                        ifelse(data$MAP >= 1000 & data$MAP < 1500, '1000-1500',
+                               ifelse(data$MAP >= 1500 & data$MAP < 2000, '1500-2000',
+                                      ifelse(data$MAP >= 2000 & data$MAP < 2500, '2000-2500',
+                                             ifelse(data$MAP >= 2500 & data$MAP < 3000, '2500-3000',
+                                                    '>3000')))))
+data$MATCLASS <- ifelse(data$MAT >= 10 & data$MAT < 15, '10-15', 
+                        ifelse(data$MAT >= 15 & data$MAT < 20, '15-20',
+                               ifelse(data$MAT >= 20 & data$MAT < 25, '20-25',
+                                      '25+')))
+ggplot(data) + geom_point(aes(x=DAYSINFIELD, y=PERCENT_MASS_LEFT, color=MAP)) + facet_grid(caseID~MATCLASS)
+
+save(file='processData.RData', data)
+```
+
