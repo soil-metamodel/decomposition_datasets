@@ -7,17 +7,18 @@ output: html_document
 
 This is the main public repository for a meta-data study collecting data sets related to soil and litter decompositon. Each study has it's own folder which will include:
 
-* README.txt - meta-information on the study including links to archive repository, links to manuscripts associated with the original publication, contact for the study (if applicable), and other comments.
-* data files in their original format
-* processData.Rmd - an Rmarkdown document which processes the orginal data files into a long format csv file (processedData.csv) with the specifications outlined below, including the treatment id key, and includes basic visualizations.
+* `README.txt` - meta-information on the study including links to archive repository, links to manuscripts associated with the original publication, contact for the study (if applicable), and other comments.
+* `authorYYYYdatatype/` directories contain data files in their original format
+* `processData.Rmd` - an Rmarkdown document which processes the orginal data files into a long format csv file (`processedData.csv`) with the specifications outlined below, including the treatment id key, and includes basic visualizations.
 
-ProcessedData.csv should contain the following columns:
+`ProcessedData.csv` will contain the following columns:
 
-* TreatmentID - A unique character string that should combine field and incubation treatment information in a moderately intuitive manner. For example: if the soil core in MyStudy was taken from a nitrogen field treatment location and incubated at 15C in the lab 'MyStudy_N_15C' might be used. The key should be defined in the processData text.
-* Time - time of the measurement in day
-* Type - type of measurement. For example: CO2_flux or SOC
-* Value - value of measurement
-* Sd - standard deviation of aggregated replicates or (preferablly) measurement error standard deviation
-* Unit - unit of measurement, this should be in standard SI units: kg, day, m
+* `TreatmentID` - A unique character string that should combine field and incubation treatment information in a moderately intuitive manner. For example: if the soil core in MyStudy was taken from a nitrogen field treatment location and incubated at 15C in the lab 'MyStudy_N_15C' might be used. The key should be defined in the processData text.
+* `DateTime` - day and time of the measurement in day in `YYYY-MM-DD HH:MM:SS` format 
+* `Type` - type of measurement. For example: `CO2_flux` or `SOC`
+* `Value` - value of measurement
+* `Sd` - standard deviation of aggregated replicates or (preferablly) measurement error standard deviation
+* `n` - sample size
+* `Unit` - unit of measurement, this should be in standard SI units: kg, day, m
 
 
