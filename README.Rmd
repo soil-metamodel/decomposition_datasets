@@ -1,23 +1,53 @@
 ---
 title: "README"
-author: "K Todd-Brown (ktoddbrown@gmail.com)"
+author: "K Todd-Brown (ktoddbrown@gmail.com); D LeBauer (dlebauer@gmail.com)"
 date: "April 29, 2015"
 output: html_document
 ---
 
 This is the main public repository for a meta-data study collecting data sets related to soil and litter decompositon. Each study has it's own folder which will include:
 
-* README.txt - meta-information on the study including links to archive repository, links to manuscripts associated with the original publication, contact for the study (if applicable), and other comments.
-* data files in their original format
-* processData.Rmd - an Rmarkdown document which processes the orginal data files into a long format csv file (processedData.csv) with the specifications outlined below, including the treatment id key, and includes basic visualizations.
+* `README.txt` - meta-information on the study including links to archive repository, links to manuscripts associated with the original publication, contact for the study (if applicable), and other comments.
+* `author_YYYY_datatype/` directories contain data files in their original format
+* `processData.Rmd` - an Rmarkdown document which processes the orginal data files into 4 long format csv files (`outputs/processedType.csv`) with the specifications outlined below and includes basic visualizations.
 
-ProcessedData.csv should contain the following columns:
+The respective csv columns will contain the following columns:
 
-* TreatmentID - A unique character string that should combine field and incubation treatment information in a moderately intuitive manner. For example: if the soil core in MyStudy was taken from a nitrogen field treatment location and incubated at 15C in the lab 'MyStudy_N_15C' might be used. The key should be defined in the processData text.
-* Time - time of the measurement in day
-* Type - type of measurement. For example: CO2_flux or SOC
-* Value - value of measurement
-* Sd - standard deviation of aggregated replicates or (preferablly) measurement error standard deviation
-* Unit - unit of measurement, this should be in standard SI units: kg, day, m
+### `ProcessedData.csv` - primary data set for model-data integration
 
+* study_id
+* substrate_id
+* environment_id
+* elapsed_time # days since initiation
+* carbon_flux (g CO2-C / g soil-C_t0 / d) # for soil core incubations; NA otherwise
+* carbon_stock (g C / g C_t0) # for litterbag studies; NA otherwise
+
+### `ProcessedEnvironmental.csv` - data set for enviromental sensitivity of model-data integration
+
+* environmental_id
+* percent_water # precent of field capasity
+* temperature (C) # incubation temperature
+* MAP (mm) # mean annual precipitation
+* MAT (C) # mean annual temperature
+* Latitude # location of litterbag site
+* Longitude # location of litterbag site
+
+### `ProcessedSubstrates.csv` (Initial Conditions) - data set for enviromental sensitivity of model-data integration
+
+* substrate_id
+* type # one of two options: soil or litterbag
+* percent_clay
+* percent_lignin
+* percent_carbon
+* percent_nitrogen
+
+### `ProcessedStudy.csv` - data set for study evaluation
+
+* study_id
+* author # contact author for data set (or study)
+* year # starting year of incubation or litter exposure
+* doi # DOI for data set; alternatively DOI for inital manuscript
+* method # to measure carbon flux or carbon stock
+* volume # litter or soil
+* instrument # to measure carbon flux or carbon stock
 
