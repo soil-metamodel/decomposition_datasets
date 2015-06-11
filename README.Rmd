@@ -36,6 +36,7 @@ The respective csv columns will contain the following columns:
 
 * substrate_id
 * type # one of two options: soil or litterbag
+* CO2 # TRUE: CO2 enriched, FALSE: no CO2 enrichment
 * percent_clay
 * percent_lignin
 * percent_carbon
@@ -46,7 +47,7 @@ The respective csv columns will contain the following columns:
 * study_id
 * author # contact author for data set (or study)
 * year # starting year of incubation or litter exposure
-* doi # DOI for data set; alternatively DOI for inital manuscript
+* url # url or DOI for data set; alternatively DOI for inital manuscript
 * method # to measure carbon flux or carbon stock
 * volume # litter or soil
 * instrument # to measure carbon flux or carbon stock

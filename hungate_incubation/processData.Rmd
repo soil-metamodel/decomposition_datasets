@@ -11,6 +11,13 @@ library(ggplot2)
 library(reshape2)
 ```
 
+```{r declareDF}
+data.df <- data.frame()
+environment.df <- data.frame()
+substrate.df <- data.frame()
+study.df <- data.frame()
+```
+
 ```{r soilProperties}
 soilProperty_meta <- read.xlsx(file='SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions.xlsx', sheetIndex=1)
 
@@ -22,19 +29,29 @@ cat(sprintf('Title: %s\nInvestigators: %s (contact), %s, %s,  %s, %s, %s, %s, %s
             soilProperty_meta[19,3],
             soilProperty_meta[25,3]))
 
+
+
+study.df <- data.frame(author=soilProperty_meta[6,3],
+                       url='ftp://cdiac.ornl.gov/pub/FACE/kscdata/Hungate/')
+
+```
+
+```{r getCper}
 #soilProperty <- read.xlsx(file='SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions.xlsx', sheetIndex=5)
 ##Running into issues with the 'date' cell class so exported to csv as a quick fix
 soilProperty <- read.csv(file='SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions_sheet5.csv', check.names=FALSE)
-soilProperty <- soilProperty[,c(1:4,6,10)]
+soilProperty <- soilProperty[1:361,c(1:4,6,10)]
 names(soilProperty) <- c('date', 'plot', 'CO2_treatment', 'depth_cm', 'bulkDensity_g_cm3', 'perc_C')
 
 soilProperty$depth_cm <- gsub('\\s*cm\\s*$', '', as.character(soilProperty$depth_cm))
-cat(sprintf('Throwing out [%d] measurements due to non-numeric depths. ex:\n', sum(!grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm))))
-print(head(soilProperty[!grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm),]))
+cat(sprintf('Throwing out [%d] measurements due to non-numeric depths:\n', sum(!grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm))))
+knitr::kable(soilProperty[!grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm),])
 soilProperty <- soilProperty[grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm),]
 
-cat(sprintf('Dropping [%d] entries due to missing C percentage.\n', sum(!grepl('^\\d+?\\.\\d*$', soilProperty$perc_C))))
+cat(sprintf('Dropping [%d] entries due to missing C percentage:\n', sum(!grepl('^\\d+?\\.\\d*$', soilProperty$perc_C))))
+knitr::kable(soilProperty[!grepl('^\\d+?\\.\\d*$', soilProperty$perc_C),])
 soilProperty <- soilProperty[grepl('^\\d+?\\.\\d*$', soilProperty$perc_C),]
+
 soilProperty$perc_C <- as.numeric(as.character(soilProperty$perc_C))
 soilProperty$year <- as.numeric(substr(as.character(soilProperty$date), 5, 6))
 soilProperty$year <- ifelse(soilProperty$year > 90, soilProperty$year + 1900, soilProperty$year + 2000)
@@ -42,10 +59,15 @@ soilProperty$year <- ifelse(soilProperty$year > 90, soilProperty$year + 1900, so
 depth.df <- as.data.frame(t(as.data.frame(strsplit(as.character(soilProperty$depth_cm), '-'))))
 names(depth.df) <- c('min', 'max')
 row.names(depth.df) <- NULL
+soilProperty <- cbind(soilProperty, depth.df)
 #soilProperty$newdepth <- sprintf('%03d-%03d', as.numeric(as.character(depth.df$min)), as.numeric(as.character(depth.df$max)))
-soilProperty$meanDepth_cm <- (as.numeric(as.character(depth.df$min)) + as.numeric(as.character(depth.df$max)))/2
+soilProperty$meanDepth_cm <- (as.numeric(as.character(soilProperty$min)) + as.numeric(as.character(soilProperty$max)))/2
+
 ggplot(data=soilProperty) + geom_point(aes(x=meanDepth_cm, y=bulkDensity_g_cm3, color=CO2_treatment)) + ylab('Bulk density [g cm^-3]')
 ggplot(data=soilProperty) + geom_point(aes(x=meanDepth_cm, y=perc_C, color=CO2_treatment)) + ylab('Carbon percentage [%]')
+
+ggplot(data=soilProperty) + geom_point(aes(x=meanDepth_cm, y=bulkDensity_g_cm3, color=year)) + ylab('Bulk density [g cm^-3]')
+ggplot(data=soilProperty) + geom_point(aes(x=meanDepth_cm, y=perc_C, color=year)) + ylab('Carbon percentage [%]')
 
 ```
 ```{r readIncubation}
