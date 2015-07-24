@@ -11,44 +11,61 @@ This is the main public repository for a meta-data study collecting data sets re
 * `author_YYYY_datatype/` directories contain data files in their original format
 * `processData.Rmd` - an Rmarkdown document which processes the orginal data files into 4 long format csv files (`outputs/processedType.csv`) with the specifications outlined below and includes basic visualizations.
 
-The respective csv columns will contain the following columns:
+Note that we have chosen to exclude priming experiments for the purposes of this study.
 
-### `ProcessedData.csv` - primary data set for model-data integration
+The respective csv columns will contain at most the following columns:
+
+### `ProcessedData.csv`
+Primary data set for decomposition model including time and stock/flux of carbon.
 
 * study_id
 * substrate_id
 * environment_id
+* group_id # suggested grouping for modeling study
 * elapsed_time # days since initiation
-* carbon_flux (g CO2-C / g soil-C_t0 / d) # for soil core incubations; NA otherwise
-* carbon_stock (g C / g C_t0) # for litterbag studies; NA otherwise
+* time_unit # should be day, included so that the data set can be used without reference
+* carbon_flux # (g CO2-C / g soil-C_inital / d) for soil core incubations; NA otherwise
+* carbon_stock # (g C / g C_inital) for litterbag studies; NA otherwise
+* carbon_unit # included so that the data set can be used without reference
 
-### `ProcessedEnvironmental.csv` - data set for enviromental sensitivity of model-data integration
+### `ProcessedEnvironmental.csv`
+This should describe the enviroment that the sample was incubated in, not the location which generated the sample. Data set for enviromental sensitivity of model-data integration. 
 
 * environmental_id
-* percent_water # precent of field capasity
-* temperature (C) # incubation temperature
-* MAP (mm) # mean annual precipitation
-* MAT (C) # mean annual temperature
-* Latitude # location of litterbag site
-* Longitude # location of litterbag site
+* percent_water # saturation of soil core as a percent of field capasity
+* temperature # (C) incubation temperature
+* nutrient #Nutrient addition to sample during incubation
+* MAP # (mm yr^-1) mean annual precipitation at litterbag site
+* MAT # (C) mean annual temperature at litterbag site
+* latitude # location of litterbag site
+* longitude # location of litterbag site
 
-### `ProcessedSubstrates.csv` (Initial Conditions) - data set for enviromental sensitivity of model-data integration
+### `ProcessedSubstrates.csv` (Initial Conditions)
+This should describe the sample and conditions from the sampling site. Data set for enviromental sensitivity of model-data integration, also used to identify data grouping to fit different model parameters to. 
 
 * substrate_id
 * type # one of two options: soil or litterbag
-* CO2 # TRUE: CO2 enriched, FALSE: no CO2 enrichment
+* CO2 # CO2 enrichment at sample/study site
 * percent_clay
 * percent_lignin
 * percent_carbon
 * percent_nitrogen
+* bulk_density # g cm^-3
+* d13C
+* depth_lower # lower sample depth in cm
+* depth_upper # upper sample depth in cm
+* latitude # location of soil core source site
+* longitude # location of soil core source site
+* plot # plot number from site if applicable
 
-### `ProcessedStudy.csv` - data set for study evaluation
+### `ProcessedStudy.csv`
+Data set for study evaluation.
 
 * study_id
 * author # contact author for data set (or study)
-* year # starting year of incubation or litter exposure
+* year # ending year of incubation or litter exposure
 * url # url or DOI for data set; alternatively DOI for inital manuscript
 * method # to measure carbon flux or carbon stock
-* volume # litter or soil
 * instrument # to measure carbon flux or carbon stock
-
+* primary_citation #url (dx.doi.org prefered) of main citation to describe data collect
+* volume # litter or soil volume used in study
