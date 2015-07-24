@@ -171,7 +171,7 @@ ggplot(fullData[fullData$year %in% '2007',]) + geom_line(aes(x=incubation_day, y
 ````
 
 ```{r, pullcsv}
-environment.df <- data.frame(environment_id = c('Lab_01_nutrient', 'Lab_02_control'),
+environment.df <- data.frame(environment_id = c('Lab_Hungate_nutrient', 'Lab_Hungate_control'),
                              percent_water = 60, #metadata on SICO2_FL_soil_lab_incubations.xlsx
                              temperature=23, #metadata on SICO2_FL_soil_lab_incubations.xlsx
                              nutrient=c('Nutrient', 'Control')
