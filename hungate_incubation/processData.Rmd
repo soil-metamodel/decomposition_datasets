@@ -57,6 +57,7 @@ cat(sprintf('Title: %s\nInvestigators: %s (contact), %s, %s,  %s, %s, %s, %s, %s
 ```
 
 ```{r getCper}
+#soilProperty <- read.csv(file=soilPropertyFile, check.names=FALSE)
 print(head(soilProperty[,1:15]))
 
 soilProperty <- soilProperty[1:361,c(1:4,6,7, 10, 11)]
@@ -67,6 +68,11 @@ soilProperty$depth_cm <- gsub('\\s*cm\\s*$', '', as.character(soilProperty$depth
 cat(sprintf('Throwing out [%d] measurements due to non-numeric depths:\n Ex:\n', sum(!grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm))))
 knitr::kable(soilProperty[!grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm),])
 soilProperty <- soilProperty[grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm),]
+#temp <- gsub('>','' ,soilProperty[grepl('>\\s*', soilProperty$depth_cm), 'depth_cm'])
+#soilProperty[grepl('>\\s*', soilProperty$depth_cm), 'depth_cm'] <- paste(temp, 'NA', sep='-')
+#temp <- gsub('<\\s*','' ,soilProperty[grepl('<', soilProperty$depth_cm), 'depth_cm'])
+#soilProperty[grepl('<\\s*', soilProperty$depth_cm), 'depth_cm'] <- paste('NA', temp, sep='-')
+#soilProperty <- soilProperty[!is.na(soilProperty$plot),]
 
 cat(sprintf('Dropping [%d] entries due to missing C percentage:\n', sum(!grepl('^\\d+?\\.\\d*$', soilProperty$perc_C))))
 knitr::kable(soilProperty[!grepl('^\\d+?\\.\\d*$', soilProperty$perc_C),])
@@ -91,6 +97,7 @@ soilProperty$CO2_treatment <- factor(ifelse(grepl('^E', as.character(soilPropert
 
 ggplot(data=soilProperty) + geom_point(aes(x=upperDepth_cm, y=bulkDensity_g_cm3, color=CO2_treatment)) + ylab('Bulk density [g cm^-3]')
 ggplot(data=soilProperty) + geom_point(aes(x=upperDepth_cm, y=perc_C, color=CO2_treatment)) + ylab('Carbon percentage [%]')
+ggplot(data=soilProperty) + geom_point(aes(x=bulkDensity_g_cm3, y=perc_C, color=CO2_treatment)) + ylab('Carbon percentage [%]') + xlab('Bulk density [g cm^-3]')
 ```
 
 
@@ -161,6 +168,7 @@ fullData$dCO2 <- fullData$dCO2*(fullData$perc_C/100)*1e-6
 fullData$units <- 'g-C g^-1-soil_Cinital day^-1'
 fullData$units <- factor(fullData$units)
 fullData$isSurface <- fullData$upperDepth_cm < 5
+fullData$isHighOC <- fullData$perc_C > 1
 fullData$nutrient[is.na(fullData$nutrient)] <- 'Control'
 
 ggplot(fullData) + geom_violin(data=fullData[fullData$year %in% '2007' & fullData$isSurface,], aes(x=incubation_day, y=dCO2, group=incubation_day, color=isSurface), trim=FALSE, scale='width') + geom_violin(data=fullData[fullData$year %in% '2007' & !fullData$isSurface,], aes(x=incubation_day, y=dCO2, group=incubation_day, color=isSurface), trim=FALSE, scale='width') + ylab(sprintf('dCO2 [%s]', unique(fullData$units))) + scale_x_log10() + scale_y_log10()
@@ -168,6 +176,8 @@ ggplot(fullData) + geom_violin(data=fullData[fullData$year %in% '2007' & fullDat
 ggplot(fullData) + geom_line(aes(x=incubation_day, y=dCO2, group=sample_id, color=isSurface), alpha=0.1) + geom_boxplot(data=fullData[fullData$isSurface, ], aes(x=incubation_day, y=dCO2, group=incubation_day, color=TRUE)) + geom_boxplot(data=fullData[!fullData$isSurface, ], aes(x=incubation_day, y=dCO2, group=incubation_day, color=FALSE)) + scale_x_log10() + scale_y_log10() +  facet_grid(.~year) + ylab(sprintf('dCO2 [%s]', unique(fullData$units))) 
 
 ggplot(fullData[fullData$year %in% '2007',]) + geom_line(aes(x=incubation_day, y=dCO2, group=sample_id, color=isSurface), alpha=0.1) + geom_violin(aes(x=incubation_day, y=dCO2, group=incubation_day, color=isSurface), trim=TRUE, scale='width') + scale_x_log10() + scale_y_log10() + ylab(sprintf('dCO2 [%s]', unique(fullData$units))) 
+
+ggplot(fullData) + geom_line(aes(x=incubation_day, y=dCO2, group=sample_id, color=(perc_C > 1)), alpha=0.1) + geom_boxplot(data=fullData[fullData$perc_C > 1, ], aes(x=incubation_day, y=dCO2, group=incubation_day, color=TRUE)) + geom_boxplot(data=fullData[!fullData$perc_C > 1, ], aes(x=incubation_day, y=dCO2, group=incubation_day, color=FALSE)) + scale_x_log10() + scale_y_log10() +  facet_grid(.~year) + ylab(sprintf('dCO2 [%s]', unique(fullData$units)))
 ````
 
 ```{r, pullcsv}
@@ -187,7 +197,8 @@ write.csv(file=substrateFile, substrate.df)
 
 fullData <- merge(fullData, environment.df)
 fullData$time_units <- 'day'
-fullData$group_id <- ifelse(fullData$upperDepth_cm == 0, 1, 2)
+#fullData$group_id <- ifelse(fullData$upperDepth_cm == 0, 1, 2)
+fullData$group_id <- ifelse(fullData$perc_C > 1, 1, 2)
 data.df <- merge(fullData, study.df[, c('study_id', 'year')])[,c('study_id', 'environment_id', 'sample_id','group_id', 'incubation_day', 'time_units', 'dCO2', 'units')]
 names(data.df) <- c('study_id', 'environment_id', 'sample_id', 'group_id', 'elapsed_time', 'time_units', 'carbon_flux', 'carbon_units')
 
