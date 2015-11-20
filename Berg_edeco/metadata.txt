@@ -1,0 +1,41 @@
+Data summary:
+
+Data were collected by Bjorn Berg at 47 sites across Europe, using 16 leaf litter types that were decomposed both above and belowground. In field decomposition experiments ranged from 2 to 8 years in length.
+
+Climate data (MAP and MAT) are from the CRU database. No replicates are available for these data.
+
+Data files:
+Eurodeco.csv
+
+location - site name
+country - site country
+site - site abbreviation
+lat - latitude in degrees
+long - longitude in degrees
+time - in years
+litter.spp - leaf litter species abbreviation
+	A - Grey alder
+	ALP - Aleppo pine
+	COP - Corsican pine
+	LPI - Lodgepole pine
+	MAP - Maritime pine
+	NSF - Scots pine, fertilzed
+	NSP - Norway spruce
+	SBI - Silver birch
+	SPF - Scots pine, fertilized
+	SPI - Scots pine
+	STI - Stone pine
+	TAG - Trembling aspen
+type - L = leaf litter decomposed above ground; R = leaf litter decomposed below ground
+MAT - mean annual temperature in degrees C
+MAP - mean annual precipitation in mm
+CDI_LT - climatic decomposition index, multiplicative function of water stress function and temperature function, temperature function = Lloyd and Taylor (1994) variable Q10 temperature function
+CDI_atan - climatic decomposition index, as above with arctangent temperature function as in DelGrosso et al 2005. Modeling soil CO2 emissions from ecosystems. Biogeochemistry 73:71-91
+Nt - fraction of initial nitrogen remaining at time, t
+Mt - percent of initial mass remaining at time, tf
+Cell - initial litter percent cellulose
+Lig - initial litter percent lignin
+C - initial litter percent carbon
+CN - initial litter carbon to nitrogen ratio
+LIG_N - initial litter lignin to nitrogen ratio
+
