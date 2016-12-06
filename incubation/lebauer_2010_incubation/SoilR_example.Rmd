@@ -1,0 +1,96 @@
+---
+title: "SoilR examples"
+author: "David LeBauer"
+date: "11/5/2014"
+output: html_document
+---
+
+
+```{r}
+library(data.table)
+download.file("https://raw.githubusercontent.com/soil-metamodel/decomposition_datasets/master/lebauer_2010_micrcosm/lebauer2010ldr_data.csv", 
+              destfile = "lebauer2010ldr_data.csv", 
+              method = "curl")
+
+d <- fread("lebauer2010ldr_data.csv")
+d[,`:=` (species = ifelse(substrate == "a", "Aspen", "Spruce"))]
+d <- d[order(id, time)]
+
+
+```
+
+## Calculate cumulative CO2 released
+
+need to check if this is correct ... the values should not decrease
+
+```{r}
+
+
+d[,`:=` (dc = diff(c_t),
+         eCO2 = max(c_t)-c_t), by = 'id']
+
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(d, aes(time, c_t, color = substrate)) + 
+  geom_smooth(se=FALSE) + geom_point(alpha = 0.1) +  xlab("Time (days)") + ylab("Total carbon (mg)") + facet_wrap(~species)
+
+
+ggplot(d, aes(time, eCO2, color = substrate)) + 
+  geom_smooth(se=FALSE) + geom_point(alpha = 0.1) +  xlab("Time (days)") + ylab("Evolved CO2") + facet_wrap(~species)
+```
+
+# Estimating decay rates assuming a two pool model
+
+Reproducing the example in the [SoilR vignette](http://cran.r-project.org/web/packages/SoilR/vignettes/ParameterEstimation.pdf). A work in progress ... 
+
+```{r, echo=FALSE}
+library(SoilR)
+library(FME)
+library(MASS)
+library(lattice)
+
+d[, `:=` (days = ifelse(round(time, 1) == 23.8, 24, floor(time)))]
+d[,`:=` (time = mean(time)), by = 'days']           
+aspen <- d[species == "Aspen", list(time = mean(time), eCO2 = mean(eCO2), 
+                                    eCO2sd = sd(eCO2)), by = days]
+days <- aspen$days 
+aspen$days <- NULL
+Ctotal <- d[species == "Aspen" & time == 0, mean(c_t)]
+
+eCO2func <- function(pars){
+  mod <-  TwopFeedbackModel(
+    t = days, ## should be argument to function
+    ks = pars[1:2],
+    a21 = pars[3]*pars[1],
+    a12 = pars[4]*pars[2],
+    C0 = Ctotal * c(pars[5],1-pars[5]), # Ctotal should be argument to function
+    In = 0,
+    pass = TRUE
+    )
+  AccR <- getAccumulatedRelease(mod)
+  return(data.frame(time = days,eCO2=rowSums(AccR)))
+  }
+
+eCO2cost <- function(pars){
+ modelOutput <- eCO2func(pars)
+ return(modCost(model = modelOutput, obs = aspen, err = "eCO2sd"))
+}
+
+inipars <- c(k1 = 0.5, k2 = 0.05, alpha21 = 0.5, alpha12 = 0.1, gamma = 0.5)
+
+eCO2fit <- modFit(f = eCO2cost, p = inipars, method = "Marq",
+                  upper=c(Inf,Inf,1,1,1), lower=c(0,0,0,0,0))
+
+
+fitmod <- eCO2func(eCO2fit$par)
+
+ggplot() + 
+  geom_pointrange(data = aspen, aes(time, y = eCO2, ymax = eCO2 + eCO2sd, ymin = eCO2 - eCO2sd)) + 
+  geom_smooth(data = fitmod, aes(time, eCO2)) +
+  ggtitle("probably not the correct model")
+  
+```
+

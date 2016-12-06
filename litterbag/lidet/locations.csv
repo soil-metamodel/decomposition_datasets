@@ -1,0 +1,82 @@
+DBCODE,LOCATION_CODE,KEYWORD_NAME,WEST_BOUND_COORD_decdeg,EAST_BOUND_COORD_decdeg,NORTH_BOUND_COORD_decdeg,SOUTH_BOUND_COORD_decdeg,ELEVATION_MAX_meters,ELEVATION_MIN_meters,SLOPE_percent,ASPECT_degrees
+TD023,OR,Oregon,,,,,,,,
+TD023,CA,California,,,,,,,,
+TD023,WA,Washington,,,,,,,,
+TD023,NM,New Mexico,,,,,,,,
+TD023,JRN,Jornada,,,,,,,,
+TD023,,Puerto Rico,,,,,,,,
+TD023,CWT,Coweeta Hydrologic Laboratory,,,,,,,,
+TD023,AK,Alaska,,,,,,,,
+TD023,CO,Colorado,,,,,,,,
+TD023,,Costa Rica,,,,,,,,
+TD023,OLY,Olympic National Forest,,,,,,,,
+TD023,KS,Kansas,,,,,,,,
+TD023,NC,North Carolina,,,,,,,,
+TD023,NH,New Hampshire,,,,,,,,
+TD023,MN,Minnesota,,,,,,,,
+TD023,AND,"H.J. ANDREWS EXPERIMENTAL FOREST OREGON, POST-1996",,,,,,,,
+TD023,BNZ,Bonanza Creek Experimental Forest,,,,,,,,
+TD023,MI,Michigan,,,,,,,,
+TD023,FL,Florida,,,,,,,,
+TD023,MA,Massachusetts,,,,,,,,
+TD023,HBR,Hubbard Brook Experimental Forest,,,,,,,,
+TD023,HFR,"Harvard Forest, Massachusetts",,,,,,,,
+TD023,WI,Wisconsin,,,,,,,,
+TD023,ARC,Arctic LTER site,,,,,,,,
+TD023,,Panama,,,,,,,,
+TD023,BCI,"Barro Colorado Island, Panama",,,,,,,,
+TD023,BSF,"Blodgett State Research Park, California",,,,,,,,
+TD023,CDR,"Cedar Creek Natural History Area, Minnesota",,,,,,,,
+TD023,CPR,"Central Plains Experimental Range, Colorado",,,,,,,,
+TD023,CV,"Curley Valley, Utah",,,,,,,,
+TD023,GSF,"Guanica State Forest, Puerto Rico",,,,,,,,
+TD023,JUN,"Juneau, Alaska",,,,,,,,
+TD023,KBS,"Kellog Biological Station, Michigan",,,,,,,,
+TD023,KNZ,"Konza Prairie Research Natural Area, Kansas",,,,,,,,
+TD023,LBS,"LaSelva Biological Station, Costa Rica",,,,,,,,
+TD023,LUQ,"Luquillo Experimental Forest, Puerto Rico",,,,,,,,
+TD023,LVW,"Loch Vale Watershed, Colorado",,,,,,,,
+TD023,MTV,"Monte Verde, Costa Rica",,,,,,,,
+TD023,SC,South Carolina,,,,,,,,
+TD023,NIN,"North Inlet, South Carolina",,,,,,,,
+TD023,NLK,"North Temeperate Lakes,  Wisconsin",,,,,,,,
+TD023,NWT,"Niwot Ridge and Green Lakes Valley, Colorado",,,,,,,,
+TD023,SEV,"Sevilleta, New Mexico",,,,,,,,
+TD023,SMR,"Santa Margarita Ecological Reserve, California",,,,,,,,
+TD023,UFL,"University of Florida, Florida",,,,,,,,
+TD023,VA,Virginia,,,,,,,,
+TD023,VCR,"Virginia Coast Reserve, Virginia",,,,,,,,
+TD023,UBC,"University of British Columbia, Canada",,,,,,,,
+TD023,DUK,"Duke Forest, North Carolina",,,,,,,,
+TD023,LIDET_ALL,All LIDET sites,-149.5666666,-65.8166666,68.6333333,9.1666666,365,0,,
+TD023,LIDET_JRN,Jornada Basin LIDET site,-106.75,-106.75,32.5,32.5,1410,1410,0,0
+TD023,LIDET_CWT,Coweeta Hydrologic Laboratory LIDET site,-83.5,-83.5,35,35,700,700,0,0
+TD023,LIDET_OLY,Olympic National Forest LIDET site,-123.8833333,-123.8833333,47.83333333,47.83333333,150,150,0,0
+TD023,LIDET_AND,"Andrews Experimental Forest, Oregon LIDET site",-122.1833333,-122.1833333,44.23333333,44.23333333,500,500,0,0
+TD023,LIDET_BNZ,Bonanza Creek Experimental Forest LIDET site,-148,-148,64.75,64.75,300,300,0,0
+TD023,LIDET_HBR,Hubbard Brook Experimental Forest LIDET site,-71.75,-71.75,43.93333333,43.93333333,300,300,0,0
+TD023,LIDET_HFR,"Harvard Forest, Massachusetts LIDET site",-72.25,-72.25,42.66666667,42.66666667,335,335,0,0
+TD023,LIDET_ARC,Arctic Lakes LIDET site,-149.5666667,-149.5666667,68.63333333,68.63333333,760,760,0,0
+TD023,LIDET_BCI,"Barro Colorado Island, Panama LIDET site",-79.85,-79.85,9.16666667,9.16666667,30,30,0,0
+TD023,LIDET_BSF,"Blodgett State Research Park, California LIDET site",-105.6333333,-105.6333333,38.86666667,38.86666667,1300,1300,0,0
+TD023,LIDET_CDR,"Cedar Creek Natural History Area, Minnesota LIDET site",-93.2,-93.2,45.4,45.4,230,230,0,0
+TD023,LIDET_CPR,"Central Plains Experimental Range, Colorado LIDET site",-104.7666667,-104.7666667,40.81666667,40.81666667,1650,1650,0,0
+TD023,LIDET_CV,"Curley Valley, Utah LIDET site",,,,,,,0,0
+TD023,LIDET_GSF,"Guanica State Forest, Puerto Rico LIDET site",-65.86666667,-65.86666667,17.95,17.95,80,80,0,0
+TD023,LIDET_JUN,"Juneau, Alaska LIDET site",-134,-134,58,58,100,100,0,0
+TD023,LIDET_KBS,"Kellog Biological Station, Michigan LIDET site",-85.4,-85.4,42.4,42.4,288,288,0,0
+TD023,LIDET_KNZ,"Konza Prairie Research Natural Area, Kansas LIDET site",-96.58333333,-96.58333333,39.08333333,39.08333333,366,366,0,0
+TD023,LIDET_LBS,"LaSelva Biological Station, Costa Rica LIDET site",-83,-83,10,10,35,35,0,0
+TD023,LIDET_LUQ,"Luquillo Experimental Forest, Puerto Rico LIDET site",-65.81666667,-65.81666667,18.31666667,18.31666667,350,350,0,0
+TD023,LIDET_LVW,"Loch Vale Watershed, Colorado LIDET site",-105.65,-105.65,40.28333333,40.28333333,3160,3160,0,0
+TD023,LIDET_MTV,"Monte Verde, Costa Rica LIDET site",-84.8,-84.8,10.3,10.3,1550,1550,0,0
+TD023,LIDET_NIN,"North Inlet, South Carolina LIDET site",-79.21666667,-79.21666667,33.5,33.5,2,2,0,0
+TD023,LIDET_NLK,"North Temeperate Lakes,  Wisconsin LIDET site",-89.66666667,-89.66666667,46,46,500,500,0,0
+TD023,LIDET_NWT,"Niwot Ridge and Green Lakes Valley, Colorado LIDET site",-105.6166667,-105.6166667,40.05,40.05,3650,3650,0,0
+TD023,LIDET_SEV,"Sevilleta, New Mexico LIDET site",-106.6666667,-106.6666667,34.48333333,34.48333333,1572,1572,0,0
+TD023,LIDET_SMR,"Santa Margarita Ecological Reserve, California LIDET site",-117.75,-117.75,33.5,33.5,500,500,0,0
+TD023,LIDET_UFL,"University of Florida, Florida LIDET site",-82.5,-82.5,29.75,29.75,35,35,0,0
+TD023,LIDET_VCR,"Virginia Coast Reserve, Virginia LIDET site",-75.66666667,-75.66666667,37.5,37.5,0,0,0,0
+TD023,LIDET_UBC,"University of British Columbia, Canada LIDET site",,,,,,,0,0
+TD023,LIDET_DUK,"Duke Forest, North Carolina LIDET site",,,,,,,0,0
+TD023,LIDET_EXT,Unused LIDET site (extra sample not placed at any site),-149.5666666,-65.8166666,68.6333333,9.1666666,3650,0,0,0

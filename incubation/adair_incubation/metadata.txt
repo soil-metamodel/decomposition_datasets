@@ -1,0 +1,45 @@
+Incbations:
+
+Incubations were conducted by EC Adair and J Reid in the Hobbie lab at the University of Minnesota. The study was conducted as a part of the larger Biodiversity, CO2, and Nitrogen (BioCON) study at Cedar Creek LTER. More information on BioCON is available here: http://www.biocon.umn.edu/experiments/
+The in-lab incubation was conducted from August 25, 2006 - September 27, 2007 (391 days) at 70% field capacity.
+
+Calculations:
+
+Cumulative respiration was calculated as D(t-1)rate + avg[D(t-1),D(t)]*days between samplings+D(t)rate
+
+These data were used in: Reid, J., E.C. Adair, S.E. Hobbie and P.B. Reich. 2012. Biodiversity, nitrogen deposition and CO2 affect grassland soil carbon cycling but not storage. Ecosystems. 15:580-590.
+
+Data files:
+
+adair_incubation.csv
+
+Jar - Incubation jar number
+Exp - Experiment is BioCON or e141
+Plot - BioCON plot number
+Ring - FACE (free air CO2 enrichment) ring number
+CO2 - Cenrich is 560 ppm, Camb is ambient atmospheric CO2
+N - Nenrich is 4 g N/m2/yr, Namb is ambient deposition rate
+NoSp - Number of species in the plot, 1 or 16
+NoGrp - Number of functional groups in the plot, 1 or 4
+MonoSp - Species in single species plot
+MonoGrp - Functional group in single species plot
+Time - Incubation sampling time [days]
+DDR - Daily respiration rate [mg C/g dry soil/day]
+CR - Cumulative respiration [mg C/g dry soil]
+
+adair_incubation_Carbon.csv
+
+Jar - Incubation jar number
+Exp - Experiment is BioCON or e141
+Plot - BioCON plot number
+Ring - FACE (free air CO2 enrichment) ring number
+CO2 - Cenrich is 560 ppm, Camb is ambient atmospheric CO2
+N - Nenrich is 4 g N/m2/yr, Namb is ambient deposition rate
+NoSp - Number of species in the plot, 1 or 16
+NoGrp - Number of functional groups in the plot, 1 or 4
+MonoSp - Species in single species plot
+MonoGrp - Functional group in single species plot
+Di.DDR - Day i daily respiration rate, where i = day sampled [mg C/g dry soil/day]
+Di.CR - Day i cumulative respiration [mg C/g dry soil]
+TC - Total carbon by combustion [%]
+NHC - Non-hydrolyzable C [mg C/g soil]

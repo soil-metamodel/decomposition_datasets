@@ -1,0 +1,207 @@
+---
+title: "Process data to long format"
+author: "K Todd-Brown (ktoddbrown@gmail.com)"
+date: "July 24, 2015"
+output: html_document
+---
+
+```{r, warning=FALSE}
+library(xlsx)
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(knitr)
+```
+
+```{r declareFiles}
+dataFile <- 'outputs/ProcessedData.csv'
+environmentFile <- 'outputs/ProcessedEnvironmental.csv'
+substrateFile <- 'outputs/ProcessedSubstrates.csv'
+studyFile <- 'outputs/ProcessedStudy.csv'
+metaFile <- 'SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions.xlsx'
+#R does not handle 'Date' nicely => export to csv
+soilPropertyFile <- 'SICO2_FL_Soil_C_N_15N_mineral_CPOM_density_fractions_sheet5.csv'
+incubationFile <- 'SICO2_FL_soil_lab_incubations.xlsx'
+```
+
+```{r readxml}
+soilProperty_meta <- read.xlsx(file=metaFile, sheetIndex=1)
+soilProperty <- read.csv(file=soilPropertyFile, check.names=FALSE)
+incubation_meta <- read.xlsx(file=incubationFile, sheetIndex=1)
+incubation_2002 <- read.xlsx(file=incubationFile, sheetIndex=2, startRow=7)
+incubation_2007 <- read.xlsx(file=incubationFile, sheetIndex=3, startRow=10)
+
+```
+
+```{r soilProperties}
+study.df <- data.frame(study_id=c('Hungate_2002_incubation', 'Hungate_2007_incubation'),
+                       author=soilProperty_meta[7,3],
+                       url='ftp://cdiac.ornl.gov/pub/FACE/kscdata/Hungate/',
+                       localDir='hungate_incubation',
+                       year=c(2002, 2007),
+                       method='see primary citation',
+                       volumne='~120 g',
+                       instrament='Li-cor infrared gas analyzer (model Li-7000, Lincoln Nebraska)',
+                       primary_citation='dx.doi.org/10.1016/j.soilbio.2008.09.016')
+write.csv(file=studyFile, study.df)
+```
+
+```{r outputMeta, echo=FALSE}
+cat(sprintf('Title: %s\nInvestigators: %s (contact), %s, %s,  %s, %s, %s, %s, %s, %s\nStudy period:%s -- %s\nSite: %s [%sN x %sW at %s meters]\nAbstract: %s\nMethod: %s\nAssociated publication: %s\n', soilProperty_meta[6,3], 
+            soilProperty_meta[7,3], soilProperty_meta[7,4], soilProperty_meta[7,5], soilProperty_meta[7,6],soilProperty_meta[7,7], soilProperty_meta[8,3], soilProperty_meta[8,4],soilProperty_meta[8,5],soilProperty_meta[8,6],
+            soilProperty_meta[10,3],soilProperty_meta[11,3],
+            soilProperty_meta[12,3], soilProperty_meta[13,3], soilProperty_meta[14,3], soilProperty_meta[15,3],
+            soilProperty_meta[18,3],
+            soilProperty_meta[19,3],
+            soilProperty_meta[25,3]))
+```
+
+```{r getCper}
+#soilProperty <- read.csv(file=soilPropertyFile, check.names=FALSE)
+print(head(soilProperty[,1:15]))
+
+soilProperty <- soilProperty[1:361,c(1:4,6,7, 10, 11)]
+names(soilProperty) <- c('date', 'plot', 'CO2_treatment', 'depth_cm', 'bulkDensity_g_cm3', 'd13C',  'perc_C', 'perc_N')
+kable(head(soilProperty))
+
+soilProperty$depth_cm <- gsub('\\s*cm\\s*$', '', as.character(soilProperty$depth_cm))
+cat(sprintf('Throwing out [%d] measurements due to non-numeric depths:\n Ex:\n', sum(!grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm))))
+knitr::kable(soilProperty[!grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm),])
+soilProperty <- soilProperty[grepl('^\\s*\\d+-\\d+\\s*$', soilProperty$depth_cm),]
+#temp <- gsub('>','' ,soilProperty[grepl('>\\s*', soilProperty$depth_cm), 'depth_cm'])
+#soilProperty[grepl('>\\s*', soilProperty$depth_cm), 'depth_cm'] <- paste(temp, 'NA', sep='-')
+#temp <- gsub('<\\s*','' ,soilProperty[grepl('<', soilProperty$depth_cm), 'depth_cm'])
+#soilProperty[grepl('<\\s*', soilProperty$depth_cm), 'depth_cm'] <- paste('NA', temp, sep='-')
+#soilProperty <- soilProperty[!is.na(soilProperty$plot),]
+
+cat(sprintf('Dropping [%d] entries due to missing C percentage:\n', sum(!grepl('^\\d+?\\.\\d*$', soilProperty$perc_C))))
+knitr::kable(soilProperty[!grepl('^\\d+?\\.\\d*$', soilProperty$perc_C),])
+soilProperty <- soilProperty[grepl('^\\d+?\\.\\d*$', soilProperty$perc_C),]
+
+soilProperty$perc_C <- as.numeric(as.character(soilProperty$perc_C))
+soilProperty$perc_N <- as.numeric(as.character(soilProperty$perc_N))
+soilProperty$d13C <- as.numeric(as.character(soilProperty$d13C))
+soilProperty$bulkDensity_g_cm3 <- as.numeric(as.character(soilProperty$bulkDensity_g_cm3))
+
+soilProperty$year <- as.numeric(substr(as.character(soilProperty$date), 5, 6))
+soilProperty$year <- ifelse(soilProperty$year > 90, soilProperty$year + 1900, soilProperty$year + 2000)
+
+depth.df <- ddply(soilProperty, c('depth_cm'), function(xx){
+              depthStr <- unique(xx$depth_cm)
+              ans <- unlist(strsplit(as.character(xx$depth_cm), '-'))
+              ans <- data.frame(upperDepth_cm=as.numeric(ans[1]),
+                                lowerDepth_cm=as.numeric(ans[2]))
+              })
+soilProperty <- merge(soilProperty, depth.df)
+soilProperty$CO2_treatment <- factor(ifelse(grepl('^E', as.character(soilProperty$CO2_treatment)), 'Elevated', 'Ambient'))
+
+ggplot(data=soilProperty) + geom_point(aes(x=upperDepth_cm, y=bulkDensity_g_cm3, color=CO2_treatment)) + ylab('Bulk density [g cm^-3]')
+ggplot(data=soilProperty) + geom_point(aes(x=upperDepth_cm, y=perc_C, color=CO2_treatment)) + ylab('Carbon percentage [%]')
+ggplot(data=soilProperty) + geom_point(aes(x=bulkDensity_g_cm3, y=perc_C, color=CO2_treatment)) + ylab('Carbon percentage [%]') + xlab('Bulk density [g cm^-3]')
+```
+
+
+```{r readIncubationMeta, echo=FALSE}
+cat(sprintf('Title: %s\nInvestigators: %s (contact), %s, %s,  %s, %s, %s, %s, %s\nStudy period:%s -- %s\nSite: %s [%sN x %sW at %s meters]\nAbstract: %s\nMethod: %s\nAssociated publication: %s\n', incubation_meta[6,3], 
+            incubation_meta[7,3], incubation_meta[7,4], incubation_meta[7,5], incubation_meta[7,6],incubation_meta[7,7], incubation_meta[8,3], incubation_meta[8,4],incubation_meta[8,5],
+            incubation_meta[10,3],incubation_meta[11,3],
+            incubation_meta[12,3], incubation_meta[13,3], incubation_meta[14,3], incubation_meta[15,3],
+            incubation_meta[18,3],
+            incubation_meta[19,3],
+            incubation_meta[25,3]))
+cat('Soil carbon in active, slow, and resistant fractions (ugC/g soil), and their sum (total). Active and slow calculated from CO2 production during long-term lab incubations. Resistant estimated as organic C remaining after acid hydrolysis. Also shown are rates of CO2 production in the incubations, in units of ugC/g soil/d\n')
+```
+
+```{r readIncubation2002}
+#incubation_2002 <- read.xlsx(file=incubationFile, sheetIndex=2, startRow=7)
+incubation_2002 <- incubation_2002[1:48,c(1:4, 11:16)]
+names(incubation_2002) <- c('date', 'plot', 'CO2_treatment', 'depth_cm', 'day_1', 'day_15', 'day_28', 'day_66', 'day_140', 'day_256')
+
+incubation_2002$year <- as.numeric(substr(as.character(incubation_2002$date), 1,4))
+incubation_2002$date <- NULL
+incubation_2002$depth_cm <- gsub(' cm', '', as.character(incubation_2002$depth_cm))
+incubation_2002[,grepl('^day_', names(incubation_2002))] <- lapply(incubation_2002[,grepl('^day_', names(incubation_2002))], function(xx){as.numeric(as.character(xx))})
+
+incubation_2002 <- melt(incubation_2002, id.vars = c('year', 'plot', 'CO2_treatment', 'depth_cm'), variable.name='incubation_day', value.name='dCO2')
+incubation_2002$dCO2 <- as.numeric(incubation_2002$dCO2)
+incubation_2002$incubation_day <- as.numeric(gsub('day_', '', incubation_2002$incubation_day))
+incubation_2002$units <- 'ug-C g^-1-soil d^-1'
+
+ggplot(incubation_2002) + geom_point(aes(x=incubation_day, y=dCO2, color=CO2_treatment), alpha=0.5)+scale_x_log10()+ylab(sprintf('dCO2 [%s]', unique(incubation_2002$units))) + ggtitle('2002 incubation')
+```
+
+```{r readIncubation2007}
+#incubation_2007 <- read.xlsx(file=incubationFile, sheetIndex=3, startRow=10)
+incubation_2007 <- incubation_2007[,1:16]
+names(incubation_2007) <- c('date', 'plot', 'depth_cm', 'depth_code', 'nutrient', 'CO2_treatment', 'day_1', 'day_5', 'day_16', 'day_37', 'day_65', 'day_108', 'day_163', 'day_219', 'day_335', 'day_542')
+incubation_2007$depth_code <- NULL
+
+incubation_2007$year <- as.numeric(substr(as.character(incubation_2007$date), 1,4))
+incubation_2007$date <- NULL
+incubation_2007$depth_cm <- gsub('cm$', '', as.character(incubation_2007$depth_cm))
+incubation_2007[,grepl('^day_', names(incubation_2007))] <- lapply(incubation_2007[,grepl('^day_', names(incubation_2007))], function(xx){as.numeric(as.character(xx))})
+
+incubation_2007 <- melt(incubation_2007, id.vars = c('year', 'plot', 'nutrient',  'CO2_treatment', 'depth_cm'), variable.name='incubation_day', value.name='dCO2')
+incubation_2007$dCO2 <- as.numeric(incubation_2007$dCO2)
+incubation_2007$incubation_day <- as.numeric(gsub('day_', '', incubation_2007$incubation_day))
+incubation_2007$units <- 'ug-C g^-1-soil d^-1'
+
+ggplot(incubation_2007) + geom_point(aes(x=incubation_day, y=dCO2, color=CO2_treatment), alpha=0.5)+scale_x_log10() +ylab(sprintf('dCO2 [%s]', unique(incubation_2007$units))) + ggtitle('2007 incubation')
+```
+
+```{r mergeYears}
+incubation <- rbind.fill(incubation_2007, incubation_2002)
+
+incubation$CO2_treatment <- factor(ifelse(grepl('^E', as.character(incubation$CO2_treatment)), 'Elevated', 'Ambient'))
+ggplot(incubation) + geom_point(aes(x=incubation_day, y=dCO2, color=CO2_treatment), alpha=0.5)+scale_x_log10()+ylab(sprintf('dCO2 [%s]', unique(incubation$units))) + ggtitle('2002+2007 incubation')
+```
+
+```{r pullData}
+
+soilProperty$sample_id <- 1:(dim(soilProperty)[1])
+fullData <- merge(soilProperty, incubation)
+
+cat('Dropping [', dim(incubation)[1]-dim(fullData)[1], '] of [',dim(incubation)[1],'] observations. Due to missing soil property entries.\n')
+
+fullData$dCO2 <- fullData$dCO2*(fullData$perc_C/100)*1e-6
+#fullData <- fullData[is.finite(fullData$dCO2),]
+fullData$units <- 'g-C g^-1-soil_Cinital day^-1'
+fullData$units <- factor(fullData$units)
+fullData$isSurface <- fullData$upperDepth_cm < 5
+fullData$isHighOC <- fullData$perc_C > 1
+fullData$nutrient[is.na(fullData$nutrient)] <- 'Control'
+
+ggplot(fullData) + geom_violin(data=fullData[fullData$year %in% '2007' & fullData$isSurface,], aes(x=incubation_day, y=dCO2, group=incubation_day, color=isSurface), trim=FALSE, scale='width') + geom_violin(data=fullData[fullData$year %in% '2007' & !fullData$isSurface,], aes(x=incubation_day, y=dCO2, group=incubation_day, color=isSurface), trim=FALSE, scale='width') + ylab(sprintf('dCO2 [%s]', unique(fullData$units))) + scale_x_log10() + scale_y_log10()
+
+ggplot(fullData) + geom_line(aes(x=incubation_day, y=dCO2, group=sample_id, color=isSurface), alpha=0.1) + geom_boxplot(data=fullData[fullData$isSurface, ], aes(x=incubation_day, y=dCO2, group=incubation_day, color=TRUE)) + geom_boxplot(data=fullData[!fullData$isSurface, ], aes(x=incubation_day, y=dCO2, group=incubation_day, color=FALSE)) + scale_x_log10() + scale_y_log10() +  facet_grid(.~year) + ylab(sprintf('dCO2 [%s]', unique(fullData$units))) 
+
+ggplot(fullData[fullData$year %in% '2007',]) + geom_line(aes(x=incubation_day, y=dCO2, group=sample_id, color=isSurface), alpha=0.1) + geom_violin(aes(x=incubation_day, y=dCO2, group=incubation_day, color=isSurface), trim=TRUE, scale='width') + scale_x_log10() + scale_y_log10() + ylab(sprintf('dCO2 [%s]', unique(fullData$units))) 
+
+ggplot(fullData) + geom_line(aes(x=incubation_day, y=dCO2, group=sample_id, color=(perc_C > 1)), alpha=0.1) + geom_boxplot(data=fullData[fullData$perc_C > 1, ], aes(x=incubation_day, y=dCO2, group=incubation_day, color=TRUE)) + geom_boxplot(data=fullData[!fullData$perc_C > 1, ], aes(x=incubation_day, y=dCO2, group=incubation_day, color=FALSE)) + scale_x_log10() + scale_y_log10() +  facet_grid(.~year) + ylab(sprintf('dCO2 [%s]', unique(fullData$units)))
+````
+
+```{r, pullcsv}
+environment.df <- data.frame(environment_id = c('Lab_Hungate_nutrient', 'Lab_Hungate_control'),
+                             percent_water = 60, #metadata on SICO2_FL_soil_lab_incubations.xlsx
+                             temperature=23, #metadata on SICO2_FL_soil_lab_incubations.xlsx
+                             nutrient=c('Nutrient', 'Control')
+                             )
+write.csv(file=environmentFile, environment.df)
+
+substrate.df <-unique(fullData[,c('sample_id', 'plot', 'year', 'CO2_treatment', 'd13C', 'bulkDensity_g_cm3', 'perc_C', 'perc_N', 'upperDepth_cm', 'lowerDepth_cm')])
+substrate.df$CO2_treatment <- grepl('^E', substrate.df$CO2_treatment)
+names(substrate.df) <- c('sample_id', 'plot', 'year', 'CO2', 'd13C', 'bulkDensity', 'percent_carbon', 'percent_nirogen', 'depth_upper', 'depth_lower')
+substrate.df$longitude <- '80 42 W'
+substrate.df$latitude <- '28 38 N'
+write.csv(file=substrateFile, substrate.df)
+
+fullData <- merge(fullData, environment.df)
+fullData$time_units <- 'day'
+#fullData$group_id <- ifelse(fullData$upperDepth_cm == 0, 1, 2)
+fullData$group_id <- ifelse(fullData$perc_C > 1, 1, 2)
+data.df <- merge(fullData, study.df[, c('study_id', 'year')])[,c('study_id', 'environment_id', 'sample_id','group_id', 'incubation_day', 'time_units', 'dCO2', 'units')]
+names(data.df) <- c('study_id', 'environment_id', 'sample_id', 'group_id', 'elapsed_time', 'time_units', 'carbon_flux', 'carbon_units')
+
+write.csv(file=dataFile, data.df)
+
+```

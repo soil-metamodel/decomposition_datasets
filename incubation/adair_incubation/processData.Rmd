@@ -1,0 +1,91 @@
+---
+title: "Data processing for Adair soil incubation data"
+author: "K Todd-Brown (ktoddbrown@gmail.com)"
+date: "July 24, 2015"
+output: html_document
+---
+
+```{r, warning=FALSE}
+library(xlsx)
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(knitr)
+dataFile <- 'outputs/ProcessedData.csv'
+environmentFile <- 'outputs/ProcessedEnvironmental.csv'
+substrateFile <- 'outputs/ProcessedSubstrates.csv'
+studyFile <- 'outputs/ProcessedStudy.csv'
+```
+
+```{r EnviroStudyData}
+ 
+study.df <- data.frame(
+  study_id = 'Hobbie_2007_incubation',
+  author = 'EC Adair and J Reid',
+  localDir= 'adair_incubation',
+  year = 2007,
+  method = NA,
+ volumne = '20 g moist soil',
+instrament = 'CO2 on a gas chromatograph (Shimadzu GC14, Shimadzu Scientific Instruments, Wood Dale, Illinois)',
+primary_citation='dx.doi.org/10.1007/s10021-012-9532-4'
+  )
+write.csv(file=studyFile, study.df)
+environment.df <- data.frame(
+  environmental_id = 'Lab_Hobbie',
+  temperature = 21, #from DOI: 10.1007/s10021-012-9532-4
+  percent_water = 70 #from DOI: 10.1007/s10021-012-9532-4
+  )
+write.csv(file=environmentFile, environment.df)
+```
+
+```{r}
+#temp <- read.csv('adair_incubation.csv')
+rawData <- read.csv('adair_incubation_carbon.csv') #this looks like a replicate of the other csv file
+
+dailyResp <- rawData[,!grepl('\\.CR$', names(rawData))]
+idNames <- names(dailyResp)[!grepl('\\.DRR$', names(dailyResp))]
+dailyResp <- melt(dailyResp, id.vars = idNames, variable.name='day', value.name='dCO2')
+dailyResp$units <- 'mg C/g dry soil/day'
+
+dailyResp$day <- as.numeric(gsub('^D', '', gsub('\\.DRR$', '', dailyResp$day)))
+for(xxStr in c('Jar', 'plot', 'Ring')){
+  dailyResp[,c(xxStr)] <- factor(dailyResp[,c(xxStr)])
+}
+
+dailyResp$NoSp <- factor(ifelse(dailyResp$NoSp == 1, 'low', 'high'))
+dailyResp$NoGrp <- factor(ifelse(dailyResp$NoGrp == 1, 'low', 'high'))
+
+dailyResp$dCO2 <- dailyResp$dCO2*dailyResp$TC*1e-3
+dailyResp$units <- factor('g-C g^-1-soil_Cinital day^-1')
+dailyResp$timeUnits <- factor('day')
+```
+```{r pullSubstrate}
+substrate.df <- unique(dailyResp[,c(3, 5:6, 9, 11)])
+substrate.df$MonoSp <- as.character(substrate.df$MonoSp)
+substrate.df$CO2 <- as.character(substrate.df$CO2)
+substrate.df$N <- as.character(substrate.df$N)
+substrate.df$MonoSp[substrate.df$MonoSp %in% ''] <- 'multipleType'
+substrate.df$CO2 <- substrate.df$CO2 %in% 'Cenrich'
+substrate.df$N <- ifelse(substrate.df$N %in% 'Nenrich', 'Nitrogen', 'Control')
+substrate.df$latitude <- '45 N'
+substrate.df$longitude <- '93 W'
+names(substrate.df) <- c('substrate_id', 'CO2', 'nutrient', 'veg_cover', 'percent_carbon')
+
+ggplot(substrate.df) + geom_violin(aes(x=nutrient, y=percent_carbon))
+ggplot(substrate.df) + geom_violin(aes(x=veg_cover, y=percent_carbon)) + theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+ggplot(substrate.df) + geom_violin(aes(x=CO2, y=percent_carbon))
+write.csv(file=substrateFile, substrate.df)
+
+```
+```{r}
+data.df <- dailyResp[,c('plot', 'day', 'timeUnits', 'dCO2', 'units')]
+names(data.df) <- c('substrate_id', 'time', 'time_unit', 'carbon_flux', "carbon_unit")
+data.df$environmental_id  <- 'Lab_Hobbie'
+data.df$study_id <- 'Hobbie_2007_incubation'
+data.df$group_id <- 1
+data.df <- data.df[,c('substrate_id', 'study_id','environmental_id', 'group_id', 'time', 'time_unit', 'carbon_flux', 'carbon_unit')]
+
+ggplot(data.df) + geom_line(aes(x=time, y=carbon_flux, group=substrate_id), alpha=0.1) + geom_violin(aes(x=time, y=carbon_flux, group=time), trim=FALSE, scale='width')+ scale_x_log10() + scale_y_log10()+ ylab(sprintf('dCO2 [%s]', unique(data.df$carbon_unit)))
+
+write.csv(file=dataFile, data.df)
+```
