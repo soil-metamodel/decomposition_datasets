@@ -1,0 +1,43 @@
+Data summary:
+
+Data were collected by J Powers and others (Powers et al. 2009) during a one year decomposition experiment at 23 tropical forest locations in North, Central, and South America, Asia, and Africa. The Powers et al. (2009) was a full factorial experiment with two standard leaf litter types, two fauna treatments (include or exclude fauna), and two decomposition environments (above or belowground). Fauna include treatments used 2mm mesh bags; fauna exclude treatments used 25 micrometer mesh bags. Bags were distributed at the start of the wet season in each site, or when it was convenient at sites without wet seasons (LAS and HAW) during 2002, 2003, and 2005 (ULU only) and were collected at approximately 1, 3, 5, 7, and 9 months. There are 1 to 3 replicates per site x treatment and sampling time, depending on missing bags. 17% of initial mass remained on average at the last collection.
+
+Climate data were provided for most by the manuscript (site averages from published or unpublished data). Climate data for all sites for the study period (2002-2003) are also provided from the CRU database.
+
+Citation
+Powers, J.S., R. Montgomery, E.C. Adair,  F.Q. Brearley, S.J. DeWalt, C.T. Castanho, J. Chave, E. Deinert, J.U. Ganzhorn, M.E. Gilbert, J. Antonio Gonzalez, S. Bunyavejchewin, H. Ricardo Grau, K.E. Harms, A. Hiremath, S. Iriarte-Vivar, E. Manzane, A.A. de Oliveira, L. Poorter, J. Ramanamanjato, C. Salk, A. Varela, G.D. Weiblen,  M.T. Lerdau. 2009. Decomposition in tropical forests: a pan-tropical study of the effects of litter type, litter placement and faunal exclusion across a precipitation gradient. Journal of Ecology 97(4):2636-2660.
+
+Data file:
+Tropdeco_ca.csv
+
+IDNUM - J. Powers identification number
+location - site location
+country - country of site location
+site - site abbreviation
+lat - latitude in degrees
+long - longitude in degrees
+time - time in years
+LITTERQUALITY - J. Powers litter identifier
+litter.spp - litter species. raffia = Raphia farinifera (Arecaceae) ;bay = Laurus nobilis (Lauraceae)
+ENVIRONMENT - AG = aboveground decomposition; BG = belowground decomposition
+MAT.cru - mean annual temperature in degrees C from CRU
+MAP.cru - mean annual precipitation in mm from CRU
+MAT.ms - mean annual temperature for site from manuscript
+MAP.ms - mean annual precipitation for site from manuscript
+CDI_LT - climatic decomposition index, multiplicative function of water stress function and temperature function, temperature function = Lloyd and Taylor (1994) variable Q10 temperature function
+CDI_atan - climatic decomposition index, as above with arctangent temperature function as in DelGrosso et al 2005. Modeling soil CO2 emissions from ecosystems. Biogeochemistry 73:71-91
+BLOCK - species x fauna x environment replicates were spread across two blocks at each location/site
+FAUNATREATMENT - FE = fauna excluded (52 micrometer mesh); FP = fauna present (2 mm mesh)
+REPNUM - replicate number (1-3 depending on missing bags)
+Mt - fraction of initial mass remaining
+lignin - initial litter percent lignin
+C - initial litter percent carbon
+N - initial litter percent nitrogen
+CN - initial litter carbon to nitrogen ratio
+LigN - initial litter lignin to nitrogen ratio
+P - initial litter percent phosphorus
+Mg - initial litter percent magnesium
+Ca - initial litter percent calcium
+K - initial litter percent potassium
+phenol - inital litter percent phenolics
+sla - initial litter specific leaf area in cm2 g-1 
