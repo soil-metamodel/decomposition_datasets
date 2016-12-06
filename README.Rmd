@@ -2,7 +2,9 @@
 title: "README"
 author: "K Todd-Brown (ktoddbrown@gmail.com); D LeBauer (dlebauer@gmail.com)"
 date: "April 29, 2015"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
 ---
 
 This is the main public repository for a meta-data study collecting data sets related to soil and litter decompositon. Each study has it's own folder which will include:
